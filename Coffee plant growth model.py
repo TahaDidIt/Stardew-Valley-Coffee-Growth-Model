@@ -5,25 +5,17 @@ Created on Fri Aug  2 21:35:31 2024
 @author: Taha
 """
 
-""" PLANNED LAYOUT
+""" PLANNED LAYOUT:
 
 # Setup
     imports
 
 
-
-#equation functions
-    eq1 V1
-    eq1 V2
-    eq2
-    eq3
-
-
-
-#other functions
-    testing calculator
-    coffee beans to coffee revenue calculator
-
+#functions
+    2-season model
+    (optional):
+        testing calculator
+        coffee beans to coffee revenue calculator
 
 
 #Main menu
@@ -31,15 +23,6 @@ Created on Fri Aug  2 21:35:31 2024
     Menu loop
 
 """
-
-
-
-##### SET-UP
-from datetime import datetime
-
-
-
-##### EQUATION FUNCTIONS
 
 """ EQUATION APPENDIX:
 
@@ -54,7 +37,64 @@ Equation 2: M(t) = M(t-1) + Mnew(t)
 Equation 3: I(t) = I(t-1) - Mnew(t) + 4*[M(t)]
 """
 
-#Equation 1
+
+
+##### SET-UP
+from datetime import datetime
+import pandas as pd
+
+
+##### FUNCTIONS
+
+### Two Season model
+def twoSeasonModel():
+    print("__________")
+    print("")
+    print("")
+    print("2 SEASONS MODEL:", datetime.now().strftime("%H:%M:%S"))
+    print("")
+    
+    #starting seeds
+    startSeeds = int(input("Please input number of seeds to start with: "))
+
+    #period t=0, and list initialisation
+    seedsPlanted = [startSeeds]
+    I = [startSeeds]
+    M = [0]
+    Mnew = [0]
+
+    #period 1 =< t < 5
+    for t in range(1, 5):
+        #No new plants can mature in the initial growing phase
+        #And thus no new seeds can be harvested and planted from them either
+        Mnew.append(0)
+        M.append(0)
+        seedsPlanted.append(0)
+        I.append(startSeeds)
+    
+    #period 5 =< t < 28
+    for t in range(5, 28):
+        #Newly mature plants is number of seeds planted 5 periods ago
+        Mnew.append(seedsPlanted[t-5])
+        #Total mature is amount in previous period + newly matured
+        M.append((M[t-1] + Mnew[t]))
+        #Seeds planted in this period is harvest from total mature
+        seedsPlanted.append((4 * M[t]))
+        #Total immature is Previous period - Newly matured + Seeds planted
+        I.append((I[t-1] - Mnew[t] + seedsPlanted[t]))
+    
+    #Output
+    for t in range(0, 28):
+        day = (t * 2) + 1
+        totalCrops = I[t] + M[t]
+        print("_____")
+        print("Period t=", t, ", Day ", day)
+        print("Matured today: ", Mnew[t], ", Seeds Planted: ", seedsPlanted[t])
+        print("Total Crops: ", totalCrops, ", I = ", I[t], ", M = ", M[t])
+        
+        """ working but doesnt have a use- model into dataframe
+        testdf = pd.DataFrame({"Mnew[t]": Mnew, "seedsPlanted[t]": seedsPlanted, "I[t]": I, "M[t]": M})
+        """
 
 
 
@@ -65,7 +105,7 @@ Equation 3: I(t) = I(t-1) - Mnew(t) + 4*[M(t)]
 ##### MAIN MENU
 
 ### Dictionary of menu functions
-menuFunctions = {}
+menuFunctions = {1: twoSeasonModel}
 
 ### Menu
 menuChoice = ""
